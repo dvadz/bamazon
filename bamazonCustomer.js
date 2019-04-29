@@ -66,11 +66,37 @@ function askCustomerToSelectITem(){
             console.log("You picked:" + answer.itemID);
             // TODO: confirm that itemID exists
 
+            // ask for the quantity
+            askCustomerToSelectQuantity();
         }
 
     });
 }
 
+function askCustomerToSelectQuantity(){
+    //just creating some space
+    console.log("");
+
+    inquirer.prompt({
+        type: "number",
+        name: "quantity",
+        message: "How many would like to buy?"
+    })
+    .then(function(answer){
+        if(isNaN(answer.quantity)){
+            askCustomerToSelectQuantity();
+        } else {
+            console.log("You picked:" + answer.quantity);
+            // TODO: check if there is enough inventory
+            
+            // TODO: give the total cost
+
+            // TODO: update the inventory
+
+        }
+
+    });
+}
 
 checkInventory();
 
