@@ -1,7 +1,12 @@
 var inquirer = require("inquirer");
 var mysql = require("mysql");
 
-var inventory = [];
+var bamazonApp = {
+    inventory : [],
+    item_id: 0,
+    quantity: 0
+    
+}
 
 // TODO: secure your password
 var connection = mysql.createConnection({
@@ -14,7 +19,7 @@ var connection = mysql.createConnection({
 
 });
 
-function checkInventory(query) {
+function fetchInventory(query) {
 
     connection.connect(function(error){
         if(error) {
@@ -34,15 +39,15 @@ function checkInventory(query) {
 
                 //save the response into an array for later review
                 response.forEach(element => {
-                    inventory.push(element);            
+                    bamazonApp.inventory.push(element);            
                 });
 
                 //display the inventory
                 // TODO: Don't show the index
-                console.table(inventory) ;
+                console.table(bamazonApp.inventory);
 
                 //now ask your buyer some questions
-                askCustomerToSelectITem();
+                selectITem();
             }
         ); 
         connection.end();
@@ -50,7 +55,7 @@ function checkInventory(query) {
 
 }
 
-function askCustomerToSelectITem(){
+function selectITem(){
     //just creating some space
     console.log("");
 
@@ -61,19 +66,25 @@ function askCustomerToSelectITem(){
     })
     .then(function(answer){
         if(isNaN(answer.itemID)){
-            askCustomerToSelectITem();
+            selectITem();
         } else {
-            console.log("You picked:" + answer.itemID);
             // TODO: confirm that itemID exists
-
-            // ask for the quantity
-            askCustomerToSelectQuantity();
+            bamazonApp.inventory.forEach(function(item){
+                if(answer.itemID===item.item_id){
+                    // save the itemID
+                    bamazonApp.item_id = answer.itemID;
+                    console.log(`Item: ${bamazonApp.item_id}`);
+                    // ask for the quantity
+                    selectQuantity();
+                }
+            });
+            
         }
 
     });
 }
 
-function askCustomerToSelectQuantity(){
+function selectQuantity(){
     //just creating some space
     console.log("");
 
@@ -84,7 +95,7 @@ function askCustomerToSelectQuantity(){
     })
     .then(function(answer){
         if(isNaN(answer.quantity)){
-            askCustomerToSelectQuantity();
+            selectQuantity();
         } else {
             console.log("You picked:" + answer.quantity);
             // TODO: check if there is enough inventory
@@ -98,5 +109,5 @@ function askCustomerToSelectQuantity(){
     });
 }
 
-checkInventory();
+fetchInventory();
 
