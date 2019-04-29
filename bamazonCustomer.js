@@ -8,25 +8,24 @@ var bamazonApp = {
     quantity: 0
 }
 
-// TODO: secure your password
-var connection = mysql.createConnection({
-    host: "localhost",
-    port: 3306,
-    user: "root",
-    password: "password",
-    database: "bamazon"    
-    // database: "top_songsDB"
 
-});
 
-function fetchInventory(query) {
+function fetchInventory() {
+
+    // TODO: secure your password
+    var connection = mysql.createConnection({
+        host: "localhost",
+        port: 3306,
+        user: "root",
+        password: "password",
+        database: "bamazon"    
+    });
 
     connection.connect(function(error){
         if(error) {
             console.log("ERROR setting up database connection");
             throw error;
         }
-        console.log("Database connection established");
     
         connection.query(
             "SELECT * FROM products", 
@@ -54,6 +53,42 @@ function fetchInventory(query) {
     });
 
 }
+
+function updateInventory() {
+
+    // TODO: secure your password
+    var connection = mysql.createConnection({
+        host: "localhost",
+        port: 3306,
+        user: "root",
+        password: "password",
+        database: "bamazon"    
+    });
+
+    connection.connect(function(error){
+        if(error) {
+            console.log("ERROR setting up database connection");
+            throw error;
+        }
+    
+        connection.query(
+            "UPDATE products SET stock_quantity = ? WHERE item_id = ?",
+            [
+                bamazonApp.inventory[bamazonApp.itemIndex].stock_quantity,
+                bamazonApp.item_id
+            ],
+            function(error, response){
+                if(error){
+                    console.log(">>>> ERROR UPDATING DATABASE <<<<");
+                    console.log(error.sql);
+                    throw error;
+                }
+            }
+        ); 
+        connection.end();
+    });
+}
+
 
 function selectITem(){
     //just creating some space
@@ -108,26 +143,24 @@ function selectQuantity(){
         //user input IS a number
         } else {
             bamazonApp.quantity = answer.quantity;
-            // TODO: check if there is enough inventory
+            // check if there is enough inventory
             let available = bamazonApp.inventory[bamazonApp.itemIndex].stock_quantity;
             if(bamazonApp.quantity <= available) {
                 //subtract the order quantity
                 bamazonApp.inventory[bamazonApp.itemIndex].stock_quantity -= bamazonApp.quantity;
-                // TODO: give the total cost
                 let total = bamazonApp.quantity * bamazonApp.inventory[bamazonApp.itemIndex].price;
+                // TODO: update the inventory
+                updateInventory();
+                // give the total cost
                 console.log("");
                 console.log(`Your total is $${total}`);
                 console.log("");
-            } else {
-                console.log("NOT Enough")
+        } else {
+                console.log("Sorry we don't have enough to fulfill your order");
             }
-
-            // TODO: update the inventory
-
         }
 
     });
 }
 
 fetchInventory();
-
