@@ -4,8 +4,8 @@ var mysql = require("mysql");
 var bamazonApp = {
     inventory : [],
     item_id: 0,
+    itemIndex: 0,
     quantity: 0
-    
 }
 
 // TODO: secure your password
@@ -73,14 +73,15 @@ function selectITem(){
         } else {
             // TODO: confirm that itemID exists
             let isItemIDValid = false;
-            bamazonApp.inventory.forEach(function(item){
-                if(answer.itemID===item.item_id) isItemIDValid = true;
+            bamazonApp.inventory.forEach(function(item, index){
+                if(answer.itemID===item.item_id) {
+                    isItemIDValid = true;
+                    bamazonApp.itemIndex = index;
+                }
             });
-
             if(isItemIDValid){
                 // save the itemID
                 bamazonApp.item_id = answer.itemID;
-                console.log(`Item: ${bamazonApp.item_id}`);
                 // ask for the quantity
                 selectQuantity();
             } else {
@@ -101,13 +102,25 @@ function selectQuantity(){
         message: "How many would like to buy?"
     })
     .then(function(answer){
+        //user input is NOT a number
         if(isNaN(answer.quantity)){
             selectQuantity();
+        //user input IS a number
         } else {
-            console.log("You picked:" + answer.quantity);
+            bamazonApp.quantity = answer.quantity;
             // TODO: check if there is enough inventory
-            
-            // TODO: give the total cost
+            let available = bamazonApp.inventory[bamazonApp.itemIndex].stock_quantity;
+            if(bamazonApp.quantity <= available) {
+                //subtract the order quantity
+                bamazonApp.inventory[bamazonApp.itemIndex].stock_quantity -= bamazonApp.quantity;
+                // TODO: give the total cost
+                let total = bamazonApp.quantity * bamazonApp.inventory[bamazonApp.itemIndex].price;
+                console.log("");
+                console.log(`Your total is $${total}`);
+                console.log("");
+            } else {
+                console.log("NOT Enough")
+            }
 
             // TODO: update the inventory
 
