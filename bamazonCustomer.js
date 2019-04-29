@@ -65,22 +65,29 @@ function selectITem(){
         message: "Please select from the 'item_id'?"
     })
     .then(function(answer){
+        //user input is NOT a number
         if(isNaN(answer.itemID)){
             selectITem();
+        
+        //user input IS a number
         } else {
             // TODO: confirm that itemID exists
+            let isItemIDValid = false;
             bamazonApp.inventory.forEach(function(item){
-                if(answer.itemID===item.item_id){
-                    // save the itemID
-                    bamazonApp.item_id = answer.itemID;
-                    console.log(`Item: ${bamazonApp.item_id}`);
-                    // ask for the quantity
-                    selectQuantity();
-                }
+                if(answer.itemID===item.item_id) isItemIDValid = true;
             });
-            
-        }
 
+            if(isItemIDValid){
+                // save the itemID
+                bamazonApp.item_id = answer.itemID;
+                console.log(`Item: ${bamazonApp.item_id}`);
+                // ask for the quantity
+                selectQuantity();
+            } else {
+                console.log("Item does not exist");
+                selectITem();
+            }
+        }
     });
 }
 
