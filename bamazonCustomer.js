@@ -12,7 +12,6 @@ var bamazonApp = {
 
 function fetchInventory() {
 
-    // TODO: secure your password
     var connection = mysql.createConnection({
         host: "localhost",
         port: 3306,
@@ -23,7 +22,7 @@ function fetchInventory() {
 
     connection.connect(function(error){
         if(error) {
-            console.log("ERROR setting up database connection");
+            console.log("ERROR: connection.connect");
             throw error;
         }
     
@@ -31,7 +30,7 @@ function fetchInventory() {
             "SELECT * FROM products", 
             function(error, response){
                 if(error){
-                    console.log(">>>> ERROR READING FROM DATABASE <<<<");
+                    console.log("ERROR: connection.query");
                     console.log(error.sql);
                     throw error;
                 }
@@ -42,7 +41,6 @@ function fetchInventory() {
                 });
 
                 //display the inventory
-                // TODO: Don't show the index
                 console.table(bamazonApp.inventory);
 
                 //now ask your buyer some questions
@@ -56,7 +54,6 @@ function fetchInventory() {
 
 function updateInventory() {
 
-    // TODO: secure your password
     var connection = mysql.createConnection({
         host: "localhost",
         port: 3306,
@@ -117,6 +114,8 @@ function selectITem(){
             if(isItemIDValid){
                 // save the itemID
                 bamazonApp.item_id = answer.itemID;
+                // show the name of the item that was selected
+                console.log(` You picked: ${bamazonApp.inventory[bamazonApp.itemIndex].product_name}`);
                 // ask for the quantity
                 selectQuantity();
             } else {
@@ -134,7 +133,7 @@ function selectQuantity(){
     inquirer.prompt({
         type: "number",
         name: "quantity",
-        message: "How many would like to buy?"
+        message: "How many would you like to buy?"
     })
     .then(function(answer){
         //user input is NOT a number
